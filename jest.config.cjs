@@ -7,6 +7,7 @@ module.exports = {
     'src/**/*.ts',
     '!src/**/*.d.ts',
   ],
+  coverageProvider: 'v8',
   coverageDirectory: 'coverage',
   coverageReporters: ['text', 'lcov', 'html'],
   transform: {

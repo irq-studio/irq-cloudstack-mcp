@@ -248,5 +248,5 @@ export function createOperationLogger(operation: string, requestId?: string): Lo
  * Generate a unique request ID using cryptographic randomness
  */
 function generateRequestId(): string {
-  return `req_${crypto.randomUUID()}`;
+  return `req_${globalThis.crypto?.randomUUID?.() ?? Math.random().toString(36).slice(2)}`;
 }
