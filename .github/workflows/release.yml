@@ -1,0 +1,171 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*.*.*'
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    name: Create Release
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20.x'
+          cache: 'npm'
+          registry-url: 'https://registry.npmjs.org'
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run tests
+        run: npm test
+        env:
+          CLOUDSTACK_API_URL: https://test.example.com/client/api
+          CLOUDSTACK_API_KEY: test-key-32-characters-long-12
+          CLOUDSTACK_SECRET_KEY: test-secret-key
+
+      - name: Build project
+        run: npm run build
+
+      - name: Get version from tag
+        id: get_version
+        run: echo "VERSION=${GITHUB_REF#refs/tags/v}" >> $GITHUB_OUTPUT
+
+      - name: Update package.json version
+        run: npm version ${{ steps.get_version.outputs.VERSION }} --no-git-tag-version --allow-same-version
+
+      - name: Build Bun binaries
+        run: |
+          mkdir -p dist
+          # Linux x64 binaries
+          bun build --compile --target=bun-linux-x64 --minify src/index.ts --outfile dist/cloudstack-mcp-linux-x64
+          bun build --compile --target=bun-linux-x64 --minify src/cli.ts --outfile dist/cloudstack-cli-linux-x64
+          # Linux ARM64 binaries
+          bun build --compile --target=bun-linux-arm64 --minify src/index.ts --outfile dist/cloudstack-mcp-linux-arm64
+          bun build --compile --target=bun-linux-arm64 --minify src/cli.ts --outfile dist/cloudstack-cli-linux-arm64
+          # macOS x64 binaries
+          bun build --compile --target=bun-darwin-x64 --minify src/index.ts --outfile dist/cloudstack-mcp-darwin-x64
+          bun build --compile --target=bun-darwin-x64 --minify src/cli.ts --outfile dist/cloudstack-cli-darwin-x64
+          # macOS ARM64 binaries
+          bun build --compile --target=bun-darwin-arm64 --minify src/index.ts --outfile dist/cloudstack-mcp-darwin-arm64
+          bun build --compile --target=bun-darwin-arm64 --minify src/cli.ts --outfile dist/cloudstack-cli-darwin-arm64
+          ls -lh dist/
+
+      - name: Create release package (Node.js)
+        run: |
+          mkdir -p release-package
+          cp -r build package.json package-lock.json README.md LICENSE .env.example release-package/
+          cd release-package
+          tar -czf ../irq-cloudstack-mcp-v${{ steps.get_version.outputs.VERSION }}.tar.gz .
+          cd ..
+
+      - name: Generate changelog
+        id: changelog
+        run: |
+          # Get previous tag
+          PREVIOUS_TAG=$(git describe --abbrev=0 --tags $(git rev-list --tags --skip=1 --max-count=1) 2>/dev/null || echo "")
+
+          if [ -z "$PREVIOUS_TAG" ]; then
+            echo "First release"
+            CHANGELOG="Initial release of CloudStack MCP Server"
+          else
+            echo "Generating changelog from $PREVIOUS_TAG to ${GITHUB_REF#refs/tags/}"
+            CHANGELOG=$(git log $PREVIOUS_TAG..HEAD --pretty=format:"- %s (%h)" --no-merges)
+          fi
+
+          # Save changelog to file for release notes
+          echo "$CHANGELOG" > CHANGELOG.txt
+          echo "changelog<<EOF" >> $GITHUB_OUTPUT
+          echo "$CHANGELOG" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+
+      - name: Create GitHub Release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          # Create release notes file
+          cat > release_notes.md << 'NOTES'
+          ## CloudStack MCP Server v${{ steps.get_version.outputs.VERSION }}
+
+          ### Changes
+          ${{ steps.changelog.outputs.changelog }}
+
+          ### Binary Installation (Easiest)
+
+          Download a standalone binary - no Node.js required:
+
+          ```bash
+          # Linux x64
+          curl -LO https://github.com/${{ github.repository }}/releases/download/v${{ steps.get_version.outputs.VERSION }}/cloudstack-mcp-linux-x64
+          chmod +x cloudstack-mcp-linux-x64
+
+          # Set credentials and run
+          export CLOUDSTACK_API_URL=https://your-cloudstack/client/api
+          export CLOUDSTACK_API_KEY=your-api-key
+          export CLOUDSTACK_SECRET_KEY=your-secret-key
+          ./cloudstack-mcp-linux-x64
+          ```
+
+          **Available binaries:**
+          | Platform | MCP Server | CLI |
+          |----------|------------|-----|
+          | Linux x64 | `cloudstack-mcp-linux-x64` | `cloudstack-cli-linux-x64` |
+          | Linux ARM64 | `cloudstack-mcp-linux-arm64` | `cloudstack-cli-linux-arm64` |
+          | macOS x64 | `cloudstack-mcp-darwin-x64` | `cloudstack-cli-darwin-x64` |
+          | macOS ARM64 | `cloudstack-mcp-darwin-arm64` | `cloudstack-cli-darwin-arm64` |
+
+          ### Node.js Installation
+
+          ```bash
+          # Download and extract
+          curl -L https://github.com/${{ github.repository }}/releases/download/v${{ steps.get_version.outputs.VERSION }}/irq-cloudstack-mcp-v${{ steps.get_version.outputs.VERSION }}.tar.gz | tar xz
+
+          # Install dependencies
+          npm install --production
+
+          # Configure and run
+          cp .env.example .env
+          npm start
+          ```
+
+          ### Documentation
+          - [README.md](https://github.com/${{ github.repository }}/blob/v${{ steps.get_version.outputs.VERSION }}/README.md)
+          NOTES
+
+          # Create release with all assets in a single command
+          gh release create v${{ steps.get_version.outputs.VERSION }} \
+            --title "v${{ steps.get_version.outputs.VERSION }}" \
+            --notes-file release_notes.md \
+            irq-cloudstack-mcp-v${{ steps.get_version.outputs.VERSION }}.tar.gz \
+            dist/cloudstack-mcp-linux-x64 \
+            dist/cloudstack-cli-linux-x64 \
+            dist/cloudstack-mcp-linux-arm64 \
+            dist/cloudstack-cli-linux-arm64 \
+            dist/cloudstack-mcp-darwin-x64 \
+            dist/cloudstack-cli-darwin-x64 \
+            dist/cloudstack-mcp-darwin-arm64 \
+            dist/cloudstack-cli-darwin-arm64
+
+      - name: Publish to npm (optional)
+        if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v')
+        run: npm publish --access public
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+        continue-on-error: true

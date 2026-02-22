@@ -1,0 +1,11 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Ask a Question
+    url: https://github.com/irq-studio/irq-cloudstack-mcp/discussions
+    about: Ask questions and discuss ideas with the community
+  - name: CloudStack Documentation
+    url: https://cloudstack.apache.org/docs/
+    about: Official Apache CloudStack documentation
+  - name: MCP Protocol Documentation
+    url: https://modelcontextprotocol.io
+    about: Learn more about the Model Context Protocol

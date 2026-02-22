@@ -1,0 +1,19 @@
+{
+  "students": [
+    {
+      "apiKey": "your_api_key_here",
+      "studentName": "Example User",
+      "studentId": "example",
+      "cloudstackApiKey": "",
+      "cloudstackSecretKey": "",
+      "enabled": true,
+      "createdAt": "2025-01-01T00:00:00.000Z",
+      "usageCount": 0,
+      "lastUsed": null
+    }
+  ],
+  "sharedCredentials": {
+    "cloudstackApiKey": "your_cloudstack_api_key_here",
+    "cloudstackSecretKey": "your_cloudstack_secret_key_here"
+  }
+}

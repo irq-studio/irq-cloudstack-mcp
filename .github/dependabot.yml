@@ -1,0 +1,90 @@
+version: 2
+
+updates:
+  # Enable version updates for npm dependencies
+  - package-ecosystem: "npm"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "09:00"
+    open-pull-requests-limit: 10
+    versioning-strategy: "increase"
+    commit-message:
+      prefix: "chore"
+      prefix-development: "chore"
+      include: "scope"
+
+    # Group related dependencies together
+    groups:
+      # MCP SDK updates
+      mcp-sdk:
+        patterns:
+          - "@modelcontextprotocol/*"
+        update-types:
+          - "minor"
+          - "patch"
+
+      # TypeScript and build tools
+      typescript-tooling:
+        patterns:
+          - "typescript"
+          - "ts-node"
+          - "ts-jest"
+          - "@types/*"
+        update-types:
+          - "minor"
+          - "patch"
+
+      # Testing frameworks
+      testing:
+        patterns:
+          - "jest"
+          - "@jest/*"
+          - "jest-*"
+        update-types:
+          - "minor"
+          - "patch"
+
+      # Development dependencies
+      dev-dependencies:
+        dependency-type: "development"
+        update-types:
+          - "patch"
+
+    # Ignore specific packages if needed
+    ignore:
+      # Example: ignore major version updates for specific packages
+      # - dependency-name: "package-name"
+      #   update-types: ["version-update:semver-major"]
+
+    # Automatically approve and merge patch updates for development dependencies
+    labels:
+      - "dependencies"
+      - "automated"
+
+  # Enable version updates for GitHub Actions
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "09:00"
+    commit-message:
+      prefix: "ci"
+    labels:
+      - "dependencies"
+      - "github-actions"
+
+  # Enable Docker base image updates if using Docker
+  - package-ecosystem: "docker"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "09:00"
+    commit-message:
+      prefix: "chore"
+    labels:
+      - "dependencies"
+      - "docker"

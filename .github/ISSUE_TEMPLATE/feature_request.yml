@@ -1,0 +1,91 @@
+name: Feature Request
+description: Suggest a new feature or enhancement for CloudStack MCP Server
+title: "[Feature]: "
+labels: ["enhancement", "needs-triage"]
+assignees: []
+
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for suggesting a new feature! Please provide as much detail as possible.
+
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem Statement
+      description: What problem does this feature solve? Is your feature request related to a specific use case?
+      placeholder: Describe the problem or use case
+    validations:
+      required: true
+
+  - type: textarea
+    id: solution
+    attributes:
+      label: Proposed Solution
+      description: Describe the solution you'd like to see
+      placeholder: Describe your proposed feature
+    validations:
+      required: true
+
+  - type: dropdown
+    id: component
+    attributes:
+      label: Component
+      description: Which component would this feature affect?
+      options:
+        - New MCP Tool
+        - Existing MCP Tool Enhancement
+        - CLI Interface
+        - CloudStack API Integration
+        - Error Handling
+        - Documentation
+        - Testing
+        - Other
+    validations:
+      required: true
+
+  - type: dropdown
+    id: cloudstack-api
+    attributes:
+      label: CloudStack API Command
+      description: If this involves a new CloudStack API command, which one?
+      options:
+        - Virtual Machine Command
+        - Storage Command
+        - Network Command
+        - Monitoring Command
+        - Admin Command
+        - Security Command
+        - Not Applicable
+        - Other/Unknown
+
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives Considered
+      description: Have you considered any alternative solutions or workarounds?
+      placeholder: Describe alternatives you've considered
+
+  - type: textarea
+    id: additional
+    attributes:
+      label: Additional Context
+      description: Any other context, screenshots, or examples
+      placeholder: Add any other context here
+
+  - type: textarea
+    id: api-reference
+    attributes:
+      label: CloudStack API Reference
+      description: If applicable, link to relevant CloudStack API documentation
+      placeholder: |
+        https://cloudstack.apache.org/api/apidocs-4.19/apis/...
+
+  - type: checkboxes
+    id: contribution
+    attributes:
+      label: Contribution
+      options:
+        - label: I would be willing to implement this feature
+        - label: I would be willing to help test this feature

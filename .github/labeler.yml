@@ -1,0 +1,112 @@
+# Auto-labeling configuration for pull requests based on file changes
+
+# Documentation
+'documentation':
+  - changed-files:
+    - any-glob-to-any-file:
+      - '**/*.md'
+      - 'docs/**/*'
+
+# Source code areas
+'area/handlers':
+  - changed-files:
+    - any-glob-to-any-file:
+      - 'src/handlers/**/*'
+
+'area/tools':
+  - changed-files:
+    - any-glob-to-any-file:
+      - 'src/tool-definitions/**/*'
+
+'area/client':
+  - changed-files:
+    - any-glob-to-any-file:
+      - 'src/cloudstack-client.ts'
+
+'area/cli':
+  - changed-files:
+    - any-glob-to-any-file:
+      - 'src/cli.ts'
+
+'area/server':
+  - changed-files:
+    - any-glob-to-any-file:
+      - 'src/server.ts'
+
+# Functional domains
+'domain/vm':
+  - changed-files:
+    - any-glob-to-any-file:
+      - 'src/handlers/virtual-machine-handlers.ts'
+      - 'src/tool-definitions/virtual-machine-tools.ts'
+
+'domain/storage':
+  - changed-files:
+    - any-glob-to-any-file:
+      - 'src/handlers/storage-handlers.ts'
+      - 'src/tool-definitions/storage-tools.ts'
+
+'domain/network':
+  - changed-files:
+    - any-glob-to-any-file:
+      - 'src/handlers/network-handlers.ts'
+      - 'src/tool-definitions/network-tools.ts'
+
+'domain/monitoring':
+  - changed-files:
+    - any-glob-to-any-file:
+      - 'src/handlers/monitoring-handlers.ts'
+      - 'src/tool-definitions/monitoring-tools.ts'
+
+'domain/admin':
+  - changed-files:
+    - any-glob-to-any-file:
+      - 'src/handlers/admin-handlers.ts'
+      - 'src/tool-definitions/admin-tools.ts'
+
+'domain/security':
+  - changed-files:
+    - any-glob-to-any-file:
+      - 'src/handlers/security-handlers.ts'
+      - 'src/tool-definitions/security-tools.ts'
+
+# Testing
+'testing':
+  - changed-files:
+    - any-glob-to-any-file:
+      - 'tests/**/*'
+      - '**/*.test.ts'
+      - '**/*.spec.ts'
+      - 'jest.config.js'
+
+# Configuration
+'configuration':
+  - changed-files:
+    - any-glob-to-any-file:
+      - 'tsconfig.json'
+      - 'package.json'
+      - 'package-lock.json'
+      - '.eslintrc.json'
+      - '.prettierrc'
+      - '.env.example'
+
+# CI/CD
+'ci/cd':
+  - changed-files:
+    - any-glob-to-any-file:
+      - '.github/workflows/**/*'
+      - '.github/actions/**/*'
+
+# Dependencies
+'dependencies':
+  - changed-files:
+    - any-glob-to-any-file:
+      - 'package.json'
+      - 'package-lock.json'
+
+# Types
+'types':
+  - changed-files:
+    - any-glob-to-any-file:
+      - 'src/types.ts'
+      - 'src/types/**/*'

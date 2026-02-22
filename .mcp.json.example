@@ -1,0 +1,13 @@
+{
+  "mcpServers": {
+    "irq-cloudstack": {
+      "command": "node",
+      "args": ["build/index.js"],
+      "env": {
+        "CLOUDSTACK_API_URL": "https://your-cloudstack-server/client/api",
+        "CLOUDSTACK_API_KEY": "your-api-key",
+        "CLOUDSTACK_SECRET_KEY": "your-secret-key"
+      }
+    }
+  }
+}
